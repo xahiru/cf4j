@@ -19,6 +19,7 @@ public abstract class UserSimilarityMetric implements Partible<User> {
 
   /** Matrix that contains the similarity between each pair of users */
   protected double[][] similarities;
+  protected int sparse_count = 0;
 
   /**
    * Sets the DataModel for which the similarity are going to be computed
@@ -56,6 +57,9 @@ public abstract class UserSimilarityMetric implements Partible<User> {
    */
   public abstract double similarity(User user, User otherUser);
 
+  public int sparsity(){
+	return sparse_count;
+	}
   @Override
   public void beforeRun() {}
 

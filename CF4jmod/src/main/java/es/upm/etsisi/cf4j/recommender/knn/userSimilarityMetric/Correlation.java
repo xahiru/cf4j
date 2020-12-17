@@ -5,6 +5,8 @@ import es.upm.etsisi.cf4j.data.User;
 /** Implements traditional Pearson Correlation as CF similarity metric. */
 public class Correlation extends UserSimilarityMetric {
 
+protected int sparse_count = 0;
+	 
   @Override
   public double similarity(User user, User otherUser) {
 
@@ -31,7 +33,10 @@ public class Correlation extends UserSimilarityMetric {
     }
 
     // If there is not items in common, similarity does not exists
-    if (common == 0) return Double.NEGATIVE_INFINITY;
+    if (common == 0) {
+    	sparse_count++;
+    	return Double.NEGATIVE_INFINITY;
+    }
 
     // Denominator can not be zero
     if (denActive == 0 || denTarget == 0) return Double.NEGATIVE_INFINITY;
@@ -40,4 +45,9 @@ public class Correlation extends UserSimilarityMetric {
     double correlation = num / Math.sqrt(denActive * denTarget);
     return (correlation + 1.0) / 2.0;
   }
+  @Override	
+  public int sparsity(){
+		
+		return sparse_count;
+	}
 }

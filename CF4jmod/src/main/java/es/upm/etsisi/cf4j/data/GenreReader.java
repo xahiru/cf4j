@@ -69,7 +69,7 @@ public class GenreReader {
 
 			}
 			//end of while loop
-		} else if (separator.equals("::")) {
+		} else if (separator.equals("::") ) {
 			System.out.println("separator = :: = " + separator);
 			
 			// First loop get all categories and insert into a list
@@ -104,7 +104,7 @@ public class GenreReader {
 			int counter = 0;
 			while ((line = datasetFile.readLine()) != null) {
 				System.out.println("============Insdie second loop====");
-				counter += 1;
+				
 				StringBuilder itemGenreB = new StringBuilder();
 				for (int i = 0; i < genreList.size(); i++) {
 					itemGenreB.append("0");
@@ -133,15 +133,94 @@ public class GenreReader {
 				
 				String itG = builder.toString();
 				this.genres.put(itemId, itG);
+				counter += 1;
 				System.out.println(itG);
 				System.out.println(itemId);
 				
 				
 			
-			}
+			} 
 
 			
 
+		}else if (separator.equals(",")) {
+			
+			System.out.println("separator = , = " + separator);
+			
+			
+			genreList.add("Action");
+			genreList.add("Adventure");
+			genreList.add("Animation");
+			genreList.add("Children");
+			genreList.add("Comedy");
+			genreList.add("Crime");
+			genreList.add("Documentary");
+			genreList.add("Drama");
+			genreList.add("Fantasy");
+			genreList.add("Film-Noir");
+			genreList.add("Horror");
+			genreList.add("Musical");
+			genreList.add("Mystery");
+			genreList.add("Romance");
+			genreList.add("Sci-Fi");
+			genreList.add("Thriller");
+			genreList.add("War");
+			genreList.add("Western");
+			genreList.add("Other");
+			System.out.println(genreList);
+
+			
+			
+			
+			
+			System.out.println("============read loop====");
+
+
+			int counter = 0;
+			while ((line = datasetFile.readLine()) != null) {
+				System.out.println("============Insdie second loop====");
+				
+				StringBuilder itemGenreB = new StringBuilder();
+				for (int i = 0; i < genreList.size(); i++) {
+					itemGenreB.append("0");
+				}
+				
+				System.out.println(line);
+				String[] s2 = line.split(separator);
+//				String itemId = line.substring(0, line.indexOf(separator));
+				String itemId = Integer.toString(counter);
+				
+				String categories = s2[s2.length-1];
+				System.out.println(categories);
+				String[] cat = categories.split("\\|");
+				
+				for (int i = 0; i < cat.length; i++) {
+					System.out.println(genreList.indexOf(cat[i]));
+					if (genreList.indexOf(cat[i]) != -1) {
+					itemGenreB.setCharAt(genreList.indexOf(cat[i]), '1');}
+					else {
+						itemGenreB.setCharAt(18, '1');
+					}
+					
+				}
+				
+				 char[] itemGenrechar = itemGenreB.toString().toCharArray();
+				 StringBuilder builder = new StringBuilder();
+				 for (int i = 0; i < itemGenrechar.length; i++){
+				     builder.append(itemGenrechar[i]);
+				     if (i < itemGenrechar.length - 1){
+				         builder.append(",");
+				     }
+				 }
+				
+				
+				String itG = builder.toString();
+				this.genres.put(itemId, itG);
+				counter += 1;
+				System.out.println(itG);
+				System.out.println(itemId);
+			
+		}
 		}
 		System.out.println("this.genres.size() =" + this.genres.size());
 	}
@@ -157,5 +236,15 @@ public class GenreReader {
 	public int getItemGenresInBinaryInt(String itemId) {
 		return Integer.parseInt(this.genres.get(itemId), 2);
 	}
+	
+	@Override
+	  public String toString() {
+	    return "\nNumber of genre entries: "
+	        + this.genres.size()
+	        + "\nItems list: "
+	        + this.genres.keySet()
+	        + "\ngenres list: "
+	        + this.genreList.size();
+	  }
 
 }

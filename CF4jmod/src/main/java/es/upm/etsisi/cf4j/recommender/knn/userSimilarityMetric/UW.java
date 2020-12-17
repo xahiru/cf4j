@@ -14,15 +14,41 @@ public class UW extends UserSimilarityMetric{
 	protected double[][] wieghts;
 	protected HashMap<Integer, String> userWeights = new HashMap<Integer,String>();
 	protected HashMap<Integer, String> itemWeights = new HashMap<Integer,String>();
+	protected int sparse_count = 0;
 
 	@Override
 	public double similarity(User user, User otherUser) {
-		System.out.println("==============UW sim===========");
-//		System.out.println(user.getUserIndex());
-		
-		return wieghts[user.getUserIndex()][otherUser.getUserIndex()];
-		
-//		return 0;
+//		System.out.println("==============UW sim===========");
+		double w = 0;
+		try {
+			int u = user.getUserIndex();
+			int o = otherUser.getUserIndex();
+			if (o >= datamodel.getItems().length)
+				{ 
+//				System.out.println("==============o > datamodel.getItems().length===========");
+				o = o % datamodel.getItems().length;
+				}
+			if (u >= datamodel.getUsers().length)
+			{ 
+//				System.out.println("==============datamodel.getUsers().length===========");
+				u = u % datamodel.getUsers().length;
+			}
+			
+			w = wieghts[u][o];
+			if (w == 0) {
+				sparse_count++;
+			}
+		} catch (Exception e) {
+			System.out.println(user.getUserIndex());
+			System.out.println(otherUser.getUserIndex());
+			e.printStackTrace();
+			sparse_count++;
+			
+		}
+		 
+
+			
+		return w;
 	}
 
 	public UW(GenreReader gn, DataModel dm) {
@@ -52,6 +78,8 @@ public class UW extends UserSimilarityMetric{
 					collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
 				}else if (this.gn.separator.equals("::")) {
 					 collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
+				}else if (this.gn.separator.equals(",")) {
+					 collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
 				}
 				
 				
@@ -59,14 +87,22 @@ public class UW extends UserSimilarityMetric{
 //					System.out.println(" "+user.getRatingAt(j));
 //					System.out.println("j = "+j);
 //					System.out.println("String.valueOf(user.getItemAt(j))"+String.valueOf(user.getItemAt(j)+1));
-					String itgenre = gn.getItemGenres(String.valueOf(user.getItemAt(j)+1));
-//					System.out.println("itgenre = "+itgenre);
-					double rate = user.getRatingAt(j);
-					String rates = itgenre.replace("1",String.valueOf(rate));
+//					try {
+						String itgenre = gn.getItemGenres(String.valueOf(user.getItemAt(j)+1));
+//						System.out.println("itgenre = "+itgenre);
+						double rate = user.getRatingAt(j);
+						String rates = itgenre.replace("1",String.valueOf(rate));
+						
+						
+//						System.out.println("==============result===========");
+						collector = vectorAdd(collector, rates, ",");
+						
+//					} catch (Exception e) {
+//						System.out.println("String.valueOf(user.getItemAt(j)+1)"+String.valueOf(user.getItemAt(j)+1));
+//						e.printStackTrace();
+//						
+//					}
 					
-					
-//					System.out.println("==============result===========");
-					collector = vectorAdd(collector, rates, ",");
 				}
 				
 //				System.out.println("\n==============Colletcor===========");
@@ -87,6 +123,8 @@ public class UW extends UserSimilarityMetric{
 					collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
 				}else if (this.gn.separator.equals("::")) {
 					 collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
+				}else if (this.gn.separator.equals(",")) {
+					 collector = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0";
 				}
 				for (int j = 0; j < item.getNumberOfRatings(); j++) {
 					System.out.print(" "+item.getRatingAt(j));
@@ -94,7 +132,12 @@ public class UW extends UserSimilarityMetric{
 					double rate = item.getRatingAt(j);
 					int u = item.getUserAt(j);
 //					System.out.println("==============result===========");
+//					System.out.println(u);
+//					System.out.println(rate);
+//					System.out.println("userWeights = "+ userWeights.get(u));
 					String wR = weightedRating(userWeights.get(u), rate, ",");
+//					System.out.println("wR == "+wR);
+//					System.out.println("collector == "+collector);
 					collector = vectorAdd(collector, wR, ",");	
 
 				}
@@ -146,11 +189,13 @@ public class UW extends UserSimilarityMetric{
 		StringBuilder normval = new StringBuilder();
 		
 		for (int i = 0; i < s1.length; i++) {
-	       	  sumratings += Double.valueOf(s1[i]);    	
+	       	  sumratings += Double.valueOf(s1[i]);
+
 	       }
 		
 		for (int i = 0; i < s1.length; i++) {
        	 double r = (Double.valueOf(s1[i])) / sumratings;
+//			double r = (Double.valueOf(s1[i])) / (mx-mi);
        	 normval.append(sep+Double.toString(r));
        	
        }
@@ -160,6 +205,9 @@ public class UW extends UserSimilarityMetric{
 	}
 	
 	public String weightedRating(String uWeight,double rating, String sep) {
+//		System.out.println("==============weightedRating===========");
+//		System.out.println("uWeight = "+uWeight);
+//		System.out.println("rating = "+rating);
 		
 		String[] s1 = uWeight.split(sep);
 		StringBuilder wRating = new StringBuilder();
@@ -210,6 +258,16 @@ public class UW extends UserSimilarityMetric{
 		} 	
 		return result;
 	}
-
+	@Override
+	public int sparsity(){
+		
+		return sparse_count;
+	}
+	
+	@Override
+	  public String toString() {
+	    return "\nwieghts size: "
+	        + this.wieghts.length;
+	  }
 
 }

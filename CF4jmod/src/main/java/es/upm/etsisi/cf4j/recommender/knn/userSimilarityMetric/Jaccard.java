@@ -4,6 +4,7 @@ import es.upm.etsisi.cf4j.data.User;
 
 /** Implements traditional Jaccard Index as CF similarity metric. */
 public class Jaccard extends UserSimilarityMetric {
+	  protected int sparse_count = 0;
 
   @Override
   public double similarity(User user, User otherUser) {
@@ -22,10 +23,17 @@ public class Jaccard extends UserSimilarityMetric {
     }
 
     // If there is not items in common, similarity does not exists
-    if (common == 0) return Double.NEGATIVE_INFINITY;
+    if (common == 0) {
+    	sparse_count ++;
+    	return Double.NEGATIVE_INFINITY;
+    }
 
     // Return similarity
     return (double) common
         / (double) (user.getNumberOfRatings() + otherUser.getNumberOfRatings() - common);
   }
+  @Override	
+  public int sparsity(){
+		return sparse_count;
+	}
 }

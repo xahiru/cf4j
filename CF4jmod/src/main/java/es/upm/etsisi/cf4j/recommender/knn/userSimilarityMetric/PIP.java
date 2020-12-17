@@ -18,6 +18,8 @@ public class PIP extends UserSimilarityMetric {
 
   /** Minimum rating value */
   private double min;
+  
+  protected int sparse_count = 0;
 
   @Override
   public void beforeRun() {
@@ -77,9 +79,17 @@ public class PIP extends UserSimilarityMetric {
     }
 
     // If there is not items in common, similarity does not exists
-    if (common == 0) return Double.NEGATIVE_INFINITY;
+    if (common == 0) { 
+    	sparse_count++;
+    	return Double.NEGATIVE_INFINITY;
+    	}
 
     // Return similarity
     return PIP;
   }
+  @Override	
+  public int sparsity(){
+		
+		return sparse_count;
+	}
 }

@@ -11,6 +11,8 @@ public class CJMSD extends UserSimilarityMetric {
 
   /** Maximum difference between the ratings */
   private double maxDiff;
+  
+  protected int sparse_count = 0;
 
   @Override
   public void beforeRun() {
@@ -39,7 +41,10 @@ public class CJMSD extends UserSimilarityMetric {
     }
 
     // If there is not items in common, similarity does not exists
-    if (common == 0) return Double.NEGATIVE_INFINITY;
+    if (common == 0) {
+    	sparse_count++;
+    	return Double.NEGATIVE_INFINITY;
+    }
 
     // Return similarity
     double jaccard =
@@ -50,4 +55,8 @@ public class CJMSD extends UserSimilarityMetric {
             / (double) super.datamodel.getNumberOfItems();
     return coverage * jaccard * (1d - (msd / common));
   }
+  @Override	
+  public int sparsity(){
+		return sparse_count;
+	}
 }

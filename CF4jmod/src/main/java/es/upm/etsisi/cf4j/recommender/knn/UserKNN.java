@@ -190,6 +190,7 @@ public class UserKNN extends Recommender {
         double similarity = similarities[neighborIndex];
         double rating = neighbor.getRatingAt(pos);
         double avg = neighbor.getRatingAverage();
+        
 
         num += similarity * (rating - avg);
         den += similarity;

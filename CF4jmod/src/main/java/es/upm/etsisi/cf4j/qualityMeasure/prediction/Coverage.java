@@ -24,7 +24,7 @@ public class Coverage extends QualityMeasure {
   @Override
   public double getScore(TestUser testUser, double[] predictions) {
     int count = 0;
-
+    
     for (double prediction : predictions) {
       if (!Double.isNaN(prediction)) {
         count++;
